@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "deencraft",
+	"version": "${version}",
+	"name": "DeenCraft",
+	"description": "DeenCraft is an ethical overhaul of Minecraft inspired by Islamic principles.",
+	"authors": [
+		"Mert"
+	],
+	"contact": {
+		"homepage": "https://github.com/KaasRijkeTurk",
+		"sources": "https://github.com/KaasRijkeTurk/Fabric-DeenCraft-1.21.X"
+	},
+	"license": "MIT",
+	"icon": "assets/deencraft/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.mert.deencraft.DeenCraft"
+		],
+		"fabric-datagen": [
+			"net.mert.deencraft.DeenCraftDataGenerator"
+		],
+		"client": [
+			"net.mert.deencraft.DeenCraftClient"
+		]
+	},
+	"mixins": [
+		"deencraft.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
