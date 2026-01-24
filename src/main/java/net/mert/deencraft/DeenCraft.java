@@ -2,6 +2,8 @@ package net.mert.deencraft;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.mert.deencraft.block.ModBlocks;
+import net.mert.deencraft.item.ModItems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,5 +13,8 @@ public class DeenCraft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ModItems.registerModItems();
+		ModBlocks.registerModBlocks();
+
 	}
 }

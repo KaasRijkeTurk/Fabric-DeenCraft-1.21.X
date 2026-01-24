@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_carpet",
+  "textures": {
+    "wool": "deencraft:block/prayer_mat_red"
+  }
+}
