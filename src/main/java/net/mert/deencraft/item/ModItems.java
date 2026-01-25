@@ -15,6 +15,9 @@ public class ModItems {
     public static final Item TASBIH_WOODEN = registerItem("tasbih_wooden", new Item.Settings()
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID,"tasbih_wooden"))));
 
+    public static final Item ISLAM_ICON = registerItem("islam_icon", new Item.Settings()
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "islam_icon"))));
+
     private static Item registerItem(String name, Item.Settings settings) {
         RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, name));
         Item item = new Item(settings.registryKey(key));
@@ -27,6 +30,7 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
 
             entries.add(TASBIH_WOODEN);
+            entries.add(ISLAM_ICON);
         });
     }
 }

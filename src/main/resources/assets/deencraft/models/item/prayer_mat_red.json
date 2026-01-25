@@ -1,6 +1,6 @@
 {
-  "parent": "block/carpet",
+  "parent": "item/generated",
   "textures": {
-    "wool": "deencraft:block/prayer_mat_red"
+    "layer0": "deencraft:item/prayer_mat_red"
   }
 }

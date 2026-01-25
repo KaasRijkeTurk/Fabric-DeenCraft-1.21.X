@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building_blocks",
+  "pattern": [
+    "SRS",
+    "SRS",
+    "SRS"
+  ],
+  "key": {
+    "S": "minecraft:stick",
+    "R": "minecraft:red_carpet"
+  },
+  "result": {
+    "id": "deencraft:prayer_mat_red",
+    "count": 1
+  }
+}

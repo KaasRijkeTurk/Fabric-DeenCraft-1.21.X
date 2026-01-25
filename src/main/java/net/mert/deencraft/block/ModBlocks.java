@@ -17,14 +17,27 @@ import net.minecraft.util.Identifier;
 
 public class ModBlocks {
 
- public static final Block PRAYER_MAT_RED = registerBlock("prayer_mat_red",
-            new CarpetBlock(AbstractBlock.Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DeenCraft.MOD_ID, "prayer_mat_red")))
-                    .strength(0.1f).sounds(BlockSoundGroup.WOOL))
+    public static final Block PRAYER_MAT_RED = registerBlock("prayer_mat_red",
+            new CarpetBlock(AbstractBlock.Settings.create()
+                    .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DeenCraft.MOD_ID, "prayer_mat_red")))
+                    .strength(0.1f)
+                    .sounds(BlockSoundGroup.WOOL)
+                    .nonOpaque())
+    );
+    public static final Block PRAYER_MAT_BLUE = registerBlock("prayer_mat_blue",
+            new CarpetBlock(AbstractBlock.Settings.create()
+                    .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DeenCraft.MOD_ID, "prayer_mat_blue")))
+                    .strength(0.1f)
+                    .sounds(BlockSoundGroup.WOOL)
+                    .nonOpaque())
     );
     public static void registerModBlocks() {DeenCraft.LOGGER.info("Registering Mod Blocks for " + DeenCraft.MOD_ID);
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
             entries.add(ModBlocks.PRAYER_MAT_RED);
+        });
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
+            entries.add(ModBlocks.PRAYER_MAT_BLUE);
         });
     }
 
