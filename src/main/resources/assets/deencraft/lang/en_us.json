@@ -1,7 +1,10 @@
 {
   "item.deencraft.prayer_mat_red": "Red Prayer Mat",
   "item.deencraft.prayer_mat_blue": "Blue Prayer Mat",
+  "item.deencraft.prayer_mat_green": "Green Prayer Mat",
   "item.deencraft.tasbih_wooden": "Wooden Tasbih",
+  "item.deencraft.tasbih_iron": "Iron Tasbih",
+  "item.deencraft.miswak": "Miswak",
   "itemgroup.deencraft.deencraft_items": "DeenCraft"
 
 }

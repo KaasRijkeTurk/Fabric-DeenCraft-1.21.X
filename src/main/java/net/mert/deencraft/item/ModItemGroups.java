@@ -18,8 +18,11 @@ public class ModItemGroups {
                     .displayName(Text.translatable("itemgroup.deencraft.deencraft_items"))
                     .entries((displayContext, entries) -> {
                         entries.add(ModItems.TASBIH_WOODEN);
-                        entries.add(ModBlocks.PRAYER_MAT_RED);
+                        entries.add(ModItems.TASBIH_IRON);
+                        entries.add(ModItems.MISWAK);
                         entries.add(ModBlocks.PRAYER_MAT_BLUE);
+                        entries.add(ModBlocks.PRAYER_MAT_RED);
+                        entries.add(ModBlocks.PRAYER_MAT_GREEN);
                     }).build());
 
     public static void registerItemGroups(){

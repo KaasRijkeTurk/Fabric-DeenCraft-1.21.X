@@ -1,0 +1,18 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "wool": "deencraft:block/prayer_mat_green",
+    "particle": "deencraft:block/prayer_mat_green"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+
+      "to": [16, 0.01, 16],
+      "faces": {
+        "up":    {"texture": "#wool", "cullface": "up"},
+        "down":  {"texture": "#wool", "cullface": "down"}
+      }
+    }
+  ]
+}

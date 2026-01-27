@@ -1,55 +1,53 @@
 package net.mert.deencraft.util;
 
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class PrayerTracker {
 
-    private static final String NBT_KEY = "completed_prayers";
+    private static final HashMap<UUID, ActivePrayer> activePrayers = new HashMap<>();
 
-    public static void registerPrayer(PlayerEntity player) {
-        World world = player.getEntityWorld();
-        IEntityDataSaver dataSaver = (IEntityDataSaver) player;
-        NbtCompound nbt = dataSaver.getPersistentData();
+    /** Wordt overal gebruikt (mat + tasbih) */
+    public static void startOrUpdatePrayer(ServerPlayerEntity player) {
 
-        long time = world.getTime();
-        int currentPrayer = PrayerTimeManager.getCurrentPrayerIndex(time);
+        UUID uuid = player.getUuid();
+        PrayerTime current = PrayerTime.getCurrentPrayer();
+        PrayerTime next = current.getNextPrayer();
 
-        if (currentPrayer == -1) return;
+        long minutesUntilNext = Duration.between(
+                LocalTime.now(),
+                next.time
+        ).toMinutes();
 
-        byte[] completed = nbt.getByteArray(NBT_KEY);
-        if (completed.length != 5) {
-            completed = new byte[5]; // ✅ lengte 5
+        // 🔁 al bezig → alleen info
+        if (activePrayers.containsKey(uuid)) {
+            player.sendMessage(Text.literal(
+                    "§c[DeenCraft] Je bent bezig met §e" + current.displayName +
+                            "§c. Volgend gebed over §e" + minutesUntilNext + " min"
+            ), false);
+            return;
         }
-        completed[currentPrayer] = 1;
-        nbt.putByteArray(NBT_KEY, completed);
+
+        // ▶ start nieuw gebed
+        activePrayers.put(uuid, new ActivePrayer(current));
+
+        player.sendMessage(Text.literal(
+                "§a[DeenCraft] Je bent begonnen met: §e" + current.displayName +
+                        "§a (volgend gebed over §e" + minutesUntilNext + " min§a)"
+        ), false);
     }
 
-    public static boolean isOnPrayer(PlayerEntity player) {
-        if (!(player instanceof IEntityDataSaver)) return false;
-
-        int currentPrayer = PrayerTimeManager.getCurrentPrayerIndex(player.getEntityWorld().getTime());
-
-        byte[] completed = ((IEntityDataSaver) player).getPersistentData()
-                .getByteArray(NBT_KEY);
-
-        if (currentPrayer == -1 || completed.length != 5) return false;
-
-        return completed[currentPrayer] == 1;
+    /** Voor tasbih / checks */
+    public static boolean isOnPrayer(ServerPlayerEntity player) {
+        return activePrayers.containsKey(player.getUuid());
     }
 
-    public static void applyPrayerBuffs(PlayerEntity player) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 200, 0, false, false, true));
-    }
-
-    public static void resetAllPrayers(PlayerEntity player) {
-        player.removeStatusEffect(StatusEffects.SATURATION);
-        IEntityDataSaver dataSaver = (IEntityDataSaver) player;
-        NbtCompound nbt = dataSaver.getPersistentData();
-        // FIX: nieuwe byte array van lengte 5
-        nbt.putByteArray(NBT_KEY, new byte[5]); // TYP HIER HANDMATIG [5]
+    public static void stopPrayer(ServerPlayerEntity player) {
+        activePrayers.remove(player.getUuid());
     }
 }
