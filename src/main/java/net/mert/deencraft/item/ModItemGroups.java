@@ -19,7 +19,10 @@ public class ModItemGroups {
                     .entries((displayContext, entries) -> {
                         entries.add(ModItems.TASBIH_WOODEN);
                         entries.add(ModItems.TASBIH_IRON);
+                        entries.add(ModItems.ASTROLABE);
                         entries.add(ModItems.MISWAK);
+                        entries.add(ModItems.DATE);
+                        entries.add(ModItems.DATES);
                         entries.add(ModBlocks.PRAYER_MAT_BLUE);
                         entries.add(ModBlocks.PRAYER_MAT_RED);
                         entries.add(ModBlocks.PRAYER_MAT_GREEN);

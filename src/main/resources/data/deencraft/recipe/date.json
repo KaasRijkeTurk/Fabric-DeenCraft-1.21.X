@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "food",
+  "pattern": [
+    "DDD",
+    "DDD",
+    "DDD"
+  ],
+  "key": {
+    "D": "deencraft:dates"
+  },
+  "result": {
+    "id": "deencraft:date",
+    "count": 1
+  }
+}

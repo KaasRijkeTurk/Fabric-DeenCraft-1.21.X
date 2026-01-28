@@ -20,7 +20,12 @@ public class ModItems {
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "islam_icon"))));
     public static final Item MISWAK = registerItem("miswak", new Item.Settings()
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "miswak"))));
-
+    public static final Item DATE = registerItem("date", new Item.Settings()
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "date"))));
+    public static final Item DATES = registerItem("dates", new Item.Settings()
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "dates"))));
+    public static final Item ASTROLABE = registerItem("astrolabe", new Item.Settings()
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, "astrolabe"))));
 
     private static Item registerItem(String name, Item.Settings settings) {
         RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, name));
@@ -36,6 +41,9 @@ public class ModItems {
             entries.add(TASBIH_WOODEN);
             entries.add(TASBIH_IRON);
             entries.add(MISWAK);
+            entries.add(DATE);
+            entries.add(DATES);
+            entries.add(ASTROLABE);
             entries.add(ISLAM_ICON);
         });
     }
