@@ -28,11 +28,13 @@ public class PrayerTracker {
                         PrayerTime current = PrayerTime.getCurrentPrayer(dayTime);
                         PrayerTime next = current.getNextPrayer();
                         long nextStart = next.getNextOccurrenceFrom(worldTime);
-                        long minutesUntilNext = ticksToRealtimeMinutes(server, nextStart - worldTime);
+                        long ticksUntilNext = nextStart - worldTime;
+                        long secondsUntilNext = ticksToRealtimeSeconds(server, ticksUntilNext);
+                        String nextCountdown = formatMinutesSeconds(secondsUntilNext);
 
                         player.sendMessage(Text.literal(
-                                "§e[Astrolabe] §fVolgend gebed: §b" + next.displayName +
-                                        " §f(over §b" + minutesUntilNext + " min§f)"
+                                "§e[Astrolabe] §fNu: §b" + current.displayName +
+                                        " §f| Volgend: §b" + next.displayName + " §f(over §b" + nextCountdown + "§f)"
                         ), true);
                     }
                 }
@@ -88,19 +90,20 @@ public class PrayerTracker {
         PrayerTime deadlinePrayer = pendingPrayer.getNextPrayer();
         long pendingPrayerDeadlineTick = deadlinePrayer.getNextOccurrenceFrom(worldTime);
         MinecraftServer worldServer = player.getEntityWorld().getServer();
-        long minutesUntilDeadline = worldServer != null
-                ? ticksToRealtimeMinutes(worldServer, pendingPrayerDeadlineTick - worldTime)
-                : ticksToRealtimeMinutesFallback(pendingPrayerDeadlineTick - worldTime);
+        long secondsUntilDeadline = worldServer != null
+                ? ticksToRealtimeSeconds(worldServer, pendingPrayerDeadlineTick - worldTime)
+                : ticksToRealtimeSecondsFallback(pendingPrayerDeadlineTick - worldTime);
+        String deadlineCountdown = formatMinutesSeconds(secondsUntilDeadline);
 
         ActivePrayer existing = activePrayers.get(uuid);
 
         if (existing != null && existing.prayer == current) {
-            long minutesForPending = worldServer != null
-                    ? ticksToRealtimeMinutes(worldServer, existing.pendingPrayerDeadlineTick - worldTime)
-                    : ticksToRealtimeMinutesFallback(existing.pendingPrayerDeadlineTick - worldTime);
+            long secondsForPending = worldServer != null
+                    ? ticksToRealtimeSeconds(worldServer, existing.pendingPrayerDeadlineTick - worldTime)
+                    : ticksToRealtimeSecondsFallback(existing.pendingPrayerDeadlineTick - worldTime);
             player.sendMessage(Text.literal(
                     "§c[DeenCraft] Dit gebed (§e" + current.displayName + "§c) heb je al gedaan. " +
-                            "Doe §e" + existing.pendingPrayer.displayName + "§c binnen §e" + minutesForPending + " min"
+                            "Bid §e" + existing.pendingPrayer.displayName + "§c binnen §e" + formatMinutesSeconds(secondsForPending)
             ), false);
             return;
         }
@@ -123,14 +126,14 @@ public class PrayerTracker {
         if (existing == null) {
             player.sendMessage(Text.literal(
                     "§a[DeenCraft] Je bent begonnen met: §e" + current.displayName +
-                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + minutesUntilDeadline +
-                            " min§a. " + streakInfo
+                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + deadlineCountdown +
+                            "§a. " + streakInfo
             ), false);
         } else {
             player.sendMessage(Text.literal(
                     "§a[DeenCraft] Gebed geüpdatet naar: §e" + current.displayName +
-                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + minutesUntilDeadline +
-                            " min§a. " + streakInfo
+                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + deadlineCountdown +
+                            "§a. " + streakInfo
             ), false);
         }
     }
@@ -145,16 +148,22 @@ public class PrayerTracker {
         player.removeStatusEffect(StatusEffects.RESISTANCE);
     }
 
-    private static long ticksToRealtimeMinutes(MinecraftServer server, long ticksRemaining) {
+    private static long ticksToRealtimeSeconds(MinecraftServer server, long ticksRemaining) {
         double tickRate = resolveTickRate(server);
 
-        double minutes = ticksRemaining / (tickRate * 60.0);
-        return Math.max(0L, Math.round(minutes));
+        double seconds = ticksRemaining / tickRate;
+        return Math.max(0L, Math.round(seconds));
     }
 
-    private static long ticksToRealtimeMinutesFallback(long ticksRemaining) {
-        double minutes = ticksRemaining / (20.0 * 60.0);
-        return Math.max(0L, Math.round(minutes));
+    private static long ticksToRealtimeSecondsFallback(long ticksRemaining) {
+        double seconds = ticksRemaining / 20.0;
+        return Math.max(0L, Math.round(seconds));
+    }
+
+    private static String formatMinutesSeconds(long secondsTotal) {
+        long minutes = secondsTotal / 60;
+        long seconds = secondsTotal % 60;
+        return minutes + "m " + seconds + "s";
     }
 
 
