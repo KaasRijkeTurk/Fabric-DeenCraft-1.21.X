@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.mert.deencraft.block.ModBlocks;
 import net.mert.deencraft.event.PlayerTickHandler;
+import net.mert.deencraft.event.PrayerMatClickHandler;
 import net.mert.deencraft.event.WaterDrinkHandler;
 import net.mert.deencraft.item.ModItemGroups;
 import net.mert.deencraft.item.ModItems;
@@ -24,6 +25,7 @@ public class DeenCraft implements ModInitializer {
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
 
+		PrayerMatClickHandler.register();
 		WaterDrinkHandler.register(); // Deze is goed!
 		PlayerTickHandler.register();
 		PrayerTracker.register();

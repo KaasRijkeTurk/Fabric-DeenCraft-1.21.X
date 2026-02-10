@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.mert.deencraft.item.ModItems;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -89,6 +90,8 @@ public class PrayerTracker {
         int effectDurationTicks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, Duration.between(now, nextStart).toSeconds() * 20));
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, effectDurationTicks, 0, false, false, true));
 
+
+
         if (existing == null) {
             player.sendMessage(Text.literal(
                     "§a[DeenCraft] Je bent begonnen met: §e" + current.displayName +
@@ -112,8 +115,53 @@ public class PrayerTracker {
         player.removeStatusEffect(StatusEffects.RESISTANCE);
     }
 
-    private static boolean isHoldingAstrolabe(ServerPlayerEntity player) {
-        return player.getMainHandStack().isOf(ModItems.ASTROLABE)
-                || player.getOffHandStack().isOf(ModItems.ASTROLABE);
+    private static long ticksToRealtimeMinutes(MinecraftServer server, long ticksRemaining) {
+        double tickRate = resolveTickRate(server);
+
+        double minutes = ticksRemaining / (tickRate * 60.0);
+        return Math.max(0L, Math.round(minutes));
+    }
+
+    /**
+     * Reads the active/target server tick rate when available, with a safe 20 TPS fallback.
+     */
+    private static double resolveTickRate(MinecraftServer server) {
+        final double fallback = 20.0;
+
+        try {
+            Object tickManager = invokeNoArg(server, "getTickManager");
+            if (tickManager == null) {
+                return fallback;
+            }
+
+            // Newer versions often expose target tick rate here (used by /tick rate).
+            Object targetRate = invokeNoArg(tickManager, "getTargetTickRate");
+            if (targetRate instanceof Number number && number.doubleValue() > 0.0) {
+                return number.doubleValue();
+            }
+
+            Object currentRate = invokeNoArg(tickManager, "getTickRate");
+            if (currentRate instanceof Number number && number.doubleValue() > 0.0) {
+                return number.doubleValue();
+            }
+
+            // Some versions expose tick duration (mspt) instead of a direct rate.
+            Object msPerTick = invokeNoArg(tickManager, "getMillisPerTick");
+            if (msPerTick instanceof Number number && number.doubleValue() > 0.0) {
+                return 1000.0 / number.doubleValue();
+            }
+        } catch (ReflectiveOperationException ignored) {
+            // Fallback op standaard TPS als methodes verschillen per Minecraft-versie.
+        }
+
+        return fallback;
+    }
+
+    private static Object invokeNoArg(Object target, String methodName) throws ReflectiveOperationException {
+        try {
+            return target.getClass().getMethod(methodName).invoke(target);
+        } catch (NoSuchMethodException ignored) {
+            return null;
+        }
     }
 }
