@@ -50,14 +50,14 @@ public class PrayerTracker {
 
                 ActivePrayer activePrayer = entry.getValue();
                 long worldTime = player.getEntityWorld().getTimeOfDay();
-                long dayTime = Math.floorMod(worldTime, PrayerTime.DAY_TICKS);
-                PrayerTime currentPrayer = PrayerTime.getCurrentPrayer(dayTime);
 
-                if (worldTime >= activePrayer.nextPrayerStartTick && activePrayer.prayer != currentPrayer) {
+                // Gebed telt pas als "gemist" wanneer de volledige venster-tijd voorbij is.
+                // Voorbeeld: Fajr gedaan -> Dhuhr is pending -> pas bij start Asr is Dhuhr gemist.
+                if (worldTime >= activePrayer.pendingPrayerDeadlineTick) {
                     player.removeStatusEffect(StatusEffects.RESISTANCE);
                     player.sendMessage(Text.literal(
-                            "§c[DeenCraft] Je hebt het gebed §e" + activePrayer.nextPrayer.displayName +
-                                    "§c gemist. Je boost is verwijderd."
+                            "§c[DeenCraft] Je hebt het gebed §e" + activePrayer.pendingPrayer.displayName +
+                                    "§c gemist. Je streak is gereset."
                     ), false);
                     iterator.remove();
                 }
@@ -84,37 +84,53 @@ public class PrayerTracker {
 
         UUID uuid = player.getUuid();
         PrayerTime current = PrayerTime.getCurrentPrayer(dayTime);
-        PrayerTime next = current.getNextPrayer();
-        long nextStart = next.getNextOccurrenceFrom(worldTime);
+        PrayerTime pendingPrayer = current.getNextPrayer();
+        PrayerTime deadlinePrayer = pendingPrayer.getNextPrayer();
+        long pendingPrayerDeadlineTick = deadlinePrayer.getNextOccurrenceFrom(worldTime);
         MinecraftServer worldServer = player.getEntityWorld().getServer();
-        long minutesUntilNext = worldServer != null
-                ? ticksToRealtimeMinutes(worldServer, nextStart - worldTime)
-                : ticksToRealtimeMinutesFallback(nextStart - worldTime);
+        long minutesUntilDeadline = worldServer != null
+                ? ticksToRealtimeMinutes(worldServer, pendingPrayerDeadlineTick - worldTime)
+                : ticksToRealtimeMinutesFallback(pendingPrayerDeadlineTick - worldTime);
 
         ActivePrayer existing = activePrayers.get(uuid);
 
         if (existing != null && existing.prayer == current) {
+            long minutesForPending = worldServer != null
+                    ? ticksToRealtimeMinutes(worldServer, existing.pendingPrayerDeadlineTick - worldTime)
+                    : ticksToRealtimeMinutesFallback(existing.pendingPrayerDeadlineTick - worldTime);
             player.sendMessage(Text.literal(
-                    "§c[DeenCraft] Je bent bezig met §e" + current.displayName +
-                            "§c. Volgend gebed over §e" + minutesUntilNext + " min"
+                    "§c[DeenCraft] Dit gebed (§e" + current.displayName + "§c) heb je al gedaan. " +
+                            "Doe §e" + existing.pendingPrayer.displayName + "§c binnen §e" + minutesForPending + " min"
             ), false);
             return;
         }
 
-        activePrayers.put(uuid, new ActivePrayer(current, next, nextStart));
+        int streak = 1;
+        if (existing != null) {
+            // Alleen streak verhogen als je exact het volgende gebed op tijd hebt gedaan.
+            if (current == existing.pendingPrayer && worldTime < existing.pendingPrayerDeadlineTick) {
+                streak = existing.streak + 1;
+            }
+        }
 
-        int effectDurationTicks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, nextStart - worldTime));
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, effectDurationTicks, 0, false, false, true));
+        activePrayers.put(uuid, new ActivePrayer(current, pendingPrayer, pendingPrayerDeadlineTick, streak));
 
+        int amplifier = Math.min(3, Math.max(0, streak - 1)); // 0=Resistance I, 1=II, ...
+        int effectDurationTicks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, pendingPrayerDeadlineTick - worldTime));
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, effectDurationTicks, amplifier, false, false, true));
+
+        String streakInfo = "§bStreak: " + streak;
         if (existing == null) {
             player.sendMessage(Text.literal(
                     "§a[DeenCraft] Je bent begonnen met: §e" + current.displayName +
-                            "§a (volgend gebed over §e" + minutesUntilNext + " min§a)"
+                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + minutesUntilDeadline +
+                            " min§a. " + streakInfo
             ), false);
         } else {
             player.sendMessage(Text.literal(
                     "§a[DeenCraft] Gebed geüpdatet naar: §e" + current.displayName +
-                            "§a (volgend gebed over §e" + minutesUntilNext + " min§a)"
+                            "§a. Doe §e" + pendingPrayer.displayName + "§a binnen §e" + minutesUntilDeadline +
+                            " min§a. " + streakInfo
             ), false);
         }
     }
