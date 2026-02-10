@@ -2,6 +2,7 @@ package net.mert.deencraft.event;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.mert.deencraft.util.IEntityDataSaver;
 import net.mert.deencraft.util.ThirstData;
 import net.minecraft.block.Blocks;
@@ -11,13 +12,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class WaterDrinkHandler {
+    private static final Map<UUID, Hand> PENDING_WATER_POTION_DRINKS = new HashMap<>();
+
     public static void register() {
-        // Drinken uit de bron (met lege hand)
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (!world.isClient() && hand == Hand.MAIN_HAND && player.getStackInHand(hand).isEmpty()) {
-                // Check of de positie waar je naar kijkt water bevat
-                if (world.getFluidState(hitResult.getBlockPos()).isStill() || world.getBlockState(hitResult.getBlockPos()).isOf(Blocks.WATER)) {
+                if (world.getBlockState(hitResult.getBlockPos()).isOf(Blocks.WATER)) {
                     ThirstData.addThirst((IEntityDataSaver) player, 2, (ServerPlayerEntity) player);
                     return ActionResult.SUCCESS;
                 }
@@ -25,11 +30,9 @@ public class WaterDrinkHandler {
             return ActionResult.PASS;
         });
 
-        // Drinken uit items (Bucket / Potion)
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getStackInHand(hand);
 
-            // Snelle check voor client of ongeldige player types
             if (world.isClient() || !(player instanceof ServerPlayerEntity serverPlayer) || !(player instanceof IEntityDataSaver dataPlayer)) {
                 return ActionResult.PASS;
             }
@@ -38,28 +41,33 @@ public class WaterDrinkHandler {
                 return ActionResult.PASS;
             }
 
-            // Potion check (Water bottle)
-            if (stack.isOf(Items.POTION)) {
-                // In plaats van String matching is het beter om de Potion contents te checken,
-                // maar voor simpele mods werkt dit ook:
-                if (stack.getName().getString().toLowerCase().contains("water")) {
-                    ThirstData.addThirst(dataPlayer, 5, serverPlayer);
-                    // We geven PASS terug zodat de player de animatie van het drinken afmaakt
-                    return ActionResult.PASS;
-                }
-            }
-
-            // Water Bucket check
-            if (stack.isOf(Items.WATER_BUCKET)) {
-                ThirstData.addThirst(dataPlayer, 15, serverPlayer);
-
-                if (!player.getAbilities().creativeMode) {
-                    player.setStackInHand(hand, new ItemStack(Items.BUCKET));
-                }
-                return ActionResult.SUCCESS;
+            String itemName = stack.getName().getString().toLowerCase();
+            if (stack.isOf(Items.POTION) && itemName.contains("water")) {
+                PENDING_WATER_POTION_DRINKS.put(player.getUuid(), hand);
+                return ActionResult.PASS;
             }
 
             return ActionResult.PASS;
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                Hand trackedHand = PENDING_WATER_POTION_DRINKS.get(player.getUuid());
+                if (trackedHand == null) {
+                    continue;
+                }
+
+                if (player.isUsingItem()) {
+                    continue;
+                }
+
+                ItemStack stack = player.getStackInHand(trackedHand);
+                if (stack.isOf(Items.GLASS_BOTTLE) && player instanceof IEntityDataSaver dataPlayer) {
+                    ThirstData.addThirst(dataPlayer, 5, player);
+                }
+
+                PENDING_WATER_POTION_DRINKS.remove(player.getUuid());
+            }
         });
     }
 }
