@@ -46,9 +46,7 @@ public class DropHudOverlay implements HudRenderCallback {
     }
 
     private void drawCustomDrop(DrawContext context, Identifier texture, int x, int y) {
-
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, 9, 9);
-
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, 0.0f, 0.0f, 9, 9, 9, 9);
     }
 
 }
