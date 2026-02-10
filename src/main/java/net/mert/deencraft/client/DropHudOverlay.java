@@ -2,8 +2,8 @@ package net.mert.deencraft.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 import net.mert.deencraft.DeenCraft;
@@ -35,7 +35,6 @@ public class DropHudOverlay implements HudRenderCallback {
         for (int i = 0; i < 10; i++) {
             int xPos = x + (i * 8);
 
-            // Stap over naar RenderLayer::getGui voor correcte shader-afhandeling in 1.21.10
             drawCustomDrop(context, EMPTY_DROP, xPos, y);
 
             if (thirstLevel >= (i * 2 + 2)) {
@@ -47,8 +46,9 @@ public class DropHudOverlay implements HudRenderCallback {
     }
 
     private void drawCustomDrop(DrawContext context, Identifier texture, int x, int y) {
-        // Gebruik RenderLayer::getGui voor standaard 2D GUI elementen met texture
-        // Dit voorkomt fouten door misaligned shader states in 1.21.x
-        context.drawTexture(RenderLayer::getGui, texture, x, y, 0f, 0f, 9, 9, 9, 9);
+
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, 9, 9);
+
     }
+
 }
