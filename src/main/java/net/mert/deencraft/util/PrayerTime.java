@@ -1,5 +1,6 @@
 package net.mert.deencraft.util;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public enum PrayerTime {
@@ -33,5 +34,13 @@ public enum PrayerTime {
     public PrayerTime getNextPrayer() {
         int next = (this.ordinal() + 1) % values().length;
         return values()[next];
+    }
+
+    public LocalDateTime getNextOccurrenceFrom(LocalDateTime now) {
+        LocalDateTime candidate = now.toLocalDate().atTime(this.time);
+        if (!candidate.isAfter(now)) {
+            candidate = candidate.plusDays(1);
+        }
+        return candidate;
     }
 }
