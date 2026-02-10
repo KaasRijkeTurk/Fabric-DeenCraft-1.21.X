@@ -3,7 +3,6 @@
 	"package": "net.mert.deencraft.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"DrinkMixin",
 		"PlayerEntityMixin"
 	],
 	"injectors": {

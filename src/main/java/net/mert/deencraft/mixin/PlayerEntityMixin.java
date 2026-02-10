@@ -8,26 +8,26 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements IEntityDataSaver {
-
     @Unique
-    private float thirstLevel = 20.0f;
+    private static final String THIRST_KEY = "thirst";
 
     @Unique
     private NbtCompound persistentData;
 
     @Override
     public float getThirst() {
-        return thirstLevel;
+        return getPersistentData().getInt(THIRST_KEY).orElse(20);
     }
 
     @Override
     public void setThirst(float thirst) {
-        this.thirstLevel = Math.max(0.0f, Math.min(thirst, 20.0f));
+        int clampedThirst = Math.max(0, Math.min(Math.round(thirst), 20));
+        getPersistentData().putInt(THIRST_KEY, clampedThirst);
     }
 
     @Override
     public void addThirst(float amount) {
-        setThirst(this.thirstLevel + amount);
+        setThirst(getThirst() + amount);
     }
 
     @Override
@@ -35,13 +35,20 @@ public abstract class PlayerEntityMixin implements IEntityDataSaver {
         if (this.persistentData == null) {
             this.persistentData = new NbtCompound();
         }
+        if (!this.persistentData.contains(THIRST_KEY)) {
+            this.persistentData.putInt(THIRST_KEY, 20);
+        }
         return this.persistentData;
     }
 
     @Override
     public void setPersistentData(NbtCompound nbt) {
         this.persistentData = nbt;
+        if (!this.persistentData.contains(THIRST_KEY)) {
+            this.persistentData.putInt(THIRST_KEY, 20);
+        }
     }
+
     /*
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeThirstNbt(NbtCompound nbt, CallbackInfo ci) {

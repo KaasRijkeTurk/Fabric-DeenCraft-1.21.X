@@ -8,8 +8,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class ThirstData {
     public static void addThirst(IEntityDataSaver player, int amount, ServerPlayerEntity serverPlayer) {
         NbtCompound nbt = player.getPersistentData();
-        int thirst = nbt.getInt("thirst").orElse(0);
-        thirst = Math.min(thirst + amount, 20);
+        int thirst = nbt.getInt("thirst").orElse(20);
+        thirst = Math.max(0, Math.min(thirst + amount, 20));
         nbt.putInt("thirst", thirst);
         syncThirst(thirst, serverPlayer);
     }
