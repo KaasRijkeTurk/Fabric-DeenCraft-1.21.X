@@ -4,12 +4,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.mert.deencraft.item.ModItems;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,15 +19,14 @@ public class PrayerTracker {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            LocalDateTime now = LocalDateTime.now();
-
             if (server.getTicks() % 20 == 0) {
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     if (isHoldingAstrolabe(player)) {
-                        PrayerTime current = PrayerTime.getCurrentPrayer();
+                        long worldTime = player.getWorld().getTime();
+                        PrayerTime current = PrayerTime.getCurrentPrayer(worldTime % PrayerTime.DAY_TICKS);
                         PrayerTime next = current.getNextPrayer();
-                        LocalDateTime nextStart = next.getNextOccurrenceFrom(now);
-                        long minutesUntilNext = Math.max(0, Duration.between(now, nextStart).toMinutes());
+                        long nextStart = next.getNextOccurrenceFrom(worldTime);
+                        long minutesUntilNext = ticksToRealtimeMinutes(server, nextStart - worldTime);
 
                         player.sendMessage(Text.literal(
                                 "§e[Astrolabe] §fVolgend gebed: §b" + next.displayName +
@@ -50,9 +47,10 @@ public class PrayerTracker {
                 }
 
                 ActivePrayer activePrayer = entry.getValue();
-                PrayerTime currentPrayer = PrayerTime.getCurrentPrayer();
+                long worldTime = player.getWorld().getTime();
+                PrayerTime currentPrayer = PrayerTime.getCurrentPrayer(worldTime % PrayerTime.DAY_TICKS);
 
-                if (!now.isBefore(activePrayer.nextPrayerStart) && activePrayer.prayer != currentPrayer) {
+                if (worldTime >= activePrayer.nextPrayerStartTick && activePrayer.prayer != currentPrayer) {
                     player.removeStatusEffect(StatusEffects.RESISTANCE);
                     player.sendMessage(Text.literal(
                             "§c[DeenCraft] Je hebt het gebed §e" + activePrayer.nextPrayer.displayName +
@@ -64,16 +62,28 @@ public class PrayerTracker {
         });
     }
 
+
+    private static boolean isHoldingAstrolabe(ServerPlayerEntity player) {
+        return player.getMainHandStack().isOf(ModItems.ASTROLABE)
+                || player.getOffHandStack().isOf(ModItems.ASTROLABE);
+    }
+
     /** Wordt overal gebruikt (mat + tasbih) */
     public static void startOrUpdatePrayer(ServerPlayerEntity player) {
 
-        UUID uuid = player.getUuid();
-        LocalDateTime now = LocalDateTime.now();
-        PrayerTime current = PrayerTime.getCurrentPrayer();
-        PrayerTime next = current.getNextPrayer();
-        LocalDateTime nextStart = next.getNextOccurrenceFrom(now);
+        long worldTime = player.getWorld().getTime();
+        long dayTime = worldTime % PrayerTime.DAY_TICKS;
 
-        long minutesUntilNext = Math.max(0, Duration.between(now, nextStart).toMinutes());
+        if (PrayerTime.isSunriseForbidden(dayTime)) {
+            player.sendMessage(Text.literal("§c[DeenCraft] Tijdens zonsopkomst kan er niet gebeden worden."), false);
+            return;
+        }
+
+        UUID uuid = player.getUuid();
+        PrayerTime current = PrayerTime.getCurrentPrayer(dayTime);
+        PrayerTime next = current.getNextPrayer();
+        long nextStart = next.getNextOccurrenceFrom(worldTime);
+        long minutesUntilNext = ticksToRealtimeMinutes(player.getServer(), nextStart - worldTime);
 
         ActivePrayer existing = activePrayers.get(uuid);
 
@@ -87,10 +97,8 @@ public class PrayerTracker {
 
         activePrayers.put(uuid, new ActivePrayer(current, next, nextStart));
 
-        int effectDurationTicks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, Duration.between(now, nextStart).toSeconds() * 20));
+        int effectDurationTicks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, nextStart - worldTime));
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, effectDurationTicks, 0, false, false, true));
-
-
 
         if (existing == null) {
             player.sendMessage(Text.literal(
