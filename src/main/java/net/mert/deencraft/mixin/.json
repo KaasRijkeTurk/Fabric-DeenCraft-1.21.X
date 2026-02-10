@@ -1,10 +1,14 @@
 {
   "required": true,
   "package": "net.mert.deencraft.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityDataMixin"
   ],
-  "client": [],
-  "server": []
+  "client": [
+    "EntityDataMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

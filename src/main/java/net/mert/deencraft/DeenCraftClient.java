@@ -1,18 +1,24 @@
 package net.mert.deencraft;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.Environment;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap; // Let op deze import
-import net.minecraft.client.render.BlockRenderLayer; // Let op deze import
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.mert.deencraft.block.ModBlocks;
+import net.mert.deencraft.client.DropHudOverlay;
+import net.mert.deencraft.networking.ThirstDataSyncS2CPacket;
+import net.minecraft.client.render.RenderLayer;
 
-@Environment(EnvType.CLIENT)
 public class DeenCraftClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        // Dit gebruikt de oudere Enum stijl, die in jouw code stond:
-        BlockRenderLayerMap.putBlock(ModBlocks.PRAYER_MAT_RED, BlockRenderLayer.CUTOUT);
-        BlockRenderLayerMap.putBlock(ModBlocks.PRAYER_MAT_BLUE, BlockRenderLayer.CUTOUT);
+        // Gebruik de juiste methode voor de Prayer Mats
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(),
+                ModBlocks.PRAYER_MAT_RED, ModBlocks.PRAYER_MAT_BLUE);
+
+        // De cruciale link voor je dorst-data
+        ClientPlayNetworking.registerGlobalReceiver(ThirstDataSyncS2CPacket.ID, ThirstDataSyncS2CPacket::receive);
+
+        HudRenderCallback.EVENT.register(new DropHudOverlay());
     }
 }
