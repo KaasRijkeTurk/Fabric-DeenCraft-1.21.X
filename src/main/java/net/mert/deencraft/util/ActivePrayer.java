@@ -1,16 +1,14 @@
 package net.mert.deencraft.util;
 
-import java.time.LocalDateTime;
-
 public class ActivePrayer {
 
     public PrayerTime prayer;
     public PrayerTime nextPrayer;
-    public LocalDateTime nextPrayerStart;
+    public long nextPrayerStartTick;
 
-    public ActivePrayer(PrayerTime prayer, PrayerTime nextPrayer, LocalDateTime nextPrayerStart) {
+    public ActivePrayer(PrayerTime prayer, PrayerTime nextPrayer, long nextPrayerStartTick) {
         this.prayer = prayer;
         this.nextPrayer = nextPrayer;
-        this.nextPrayerStart = nextPrayerStart;
+        this.nextPrayerStartTick = nextPrayerStartTick;
     }
 }

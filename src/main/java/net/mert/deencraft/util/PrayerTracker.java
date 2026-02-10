@@ -4,8 +4,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.mert.deencraft.item.ModItems;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.HashMap;
@@ -22,8 +22,10 @@ public class PrayerTracker {
             if (server.getTicks() % 20 == 0) {
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     if (isHoldingAstrolabe(player)) {
-                        long worldTime = player.getWorld().getTime();
-                        PrayerTime current = PrayerTime.getCurrentPrayer(worldTime % PrayerTime.DAY_TICKS);
+                        long worldTime = player.getEntityWorld().getTimeOfDay();
+                        long dayTime = Math.floorMod(worldTime, PrayerTime.DAY_TICKS);
+
+                        PrayerTime current = PrayerTime.getCurrentPrayer(dayTime);
                         PrayerTime next = current.getNextPrayer();
                         long nextStart = next.getNextOccurrenceFrom(worldTime);
                         long minutesUntilNext = ticksToRealtimeMinutes(server, nextStart - worldTime);
@@ -47,8 +49,9 @@ public class PrayerTracker {
                 }
 
                 ActivePrayer activePrayer = entry.getValue();
-                long worldTime = player.getWorld().getTime();
-                PrayerTime currentPrayer = PrayerTime.getCurrentPrayer(worldTime % PrayerTime.DAY_TICKS);
+                long worldTime = player.getEntityWorld().getTimeOfDay();
+                long dayTime = Math.floorMod(worldTime, PrayerTime.DAY_TICKS);
+                PrayerTime currentPrayer = PrayerTime.getCurrentPrayer(dayTime);
 
                 if (worldTime >= activePrayer.nextPrayerStartTick && activePrayer.prayer != currentPrayer) {
                     player.removeStatusEffect(StatusEffects.RESISTANCE);
@@ -71,8 +74,8 @@ public class PrayerTracker {
     /** Wordt overal gebruikt (mat + tasbih) */
     public static void startOrUpdatePrayer(ServerPlayerEntity player) {
 
-        long worldTime = player.getWorld().getTime();
-        long dayTime = worldTime % PrayerTime.DAY_TICKS;
+        long worldTime = player.getEntityWorld().getTimeOfDay();
+        long dayTime = Math.floorMod(worldTime, PrayerTime.DAY_TICKS);
 
         if (PrayerTime.isSunriseForbidden(dayTime)) {
             player.sendMessage(Text.literal("§c[DeenCraft] Tijdens zonsopkomst kan er niet gebeden worden."), false);
@@ -83,7 +86,10 @@ public class PrayerTracker {
         PrayerTime current = PrayerTime.getCurrentPrayer(dayTime);
         PrayerTime next = current.getNextPrayer();
         long nextStart = next.getNextOccurrenceFrom(worldTime);
-        long minutesUntilNext = ticksToRealtimeMinutes(player.getServer(), nextStart - worldTime);
+        MinecraftServer worldServer = player.getEntityWorld().getServer();
+        long minutesUntilNext = worldServer != null
+                ? ticksToRealtimeMinutes(worldServer, nextStart - worldTime)
+                : ticksToRealtimeMinutesFallback(nextStart - worldTime);
 
         ActivePrayer existing = activePrayers.get(uuid);
 
@@ -130,6 +136,12 @@ public class PrayerTracker {
         return Math.max(0L, Math.round(minutes));
     }
 
+    private static long ticksToRealtimeMinutesFallback(long ticksRemaining) {
+        double minutes = ticksRemaining / (20.0 * 60.0);
+        return Math.max(0L, Math.round(minutes));
+    }
+
+
     /**
      * Reads the active/target server tick rate when available, with a safe 20 TPS fallback.
      */
@@ -144,19 +156,28 @@ public class PrayerTracker {
 
             // Newer versions often expose target tick rate here (used by /tick rate).
             Object targetRate = invokeNoArg(tickManager, "getTargetTickRate");
-            if (targetRate instanceof Number number && number.doubleValue() > 0.0) {
-                return number.doubleValue();
+            if (targetRate instanceof Number) {
+                double value = ((Number) targetRate).doubleValue();
+                if (value > 0.0) {
+                    return value;
+                }
             }
 
             Object currentRate = invokeNoArg(tickManager, "getTickRate");
-            if (currentRate instanceof Number number && number.doubleValue() > 0.0) {
-                return number.doubleValue();
+            if (currentRate instanceof Number) {
+                double value = ((Number) currentRate).doubleValue();
+                if (value > 0.0) {
+                    return value;
+                }
             }
 
             // Some versions expose tick duration (mspt) instead of a direct rate.
             Object msPerTick = invokeNoArg(tickManager, "getMillisPerTick");
-            if (msPerTick instanceof Number number && number.doubleValue() > 0.0) {
-                return 1000.0 / number.doubleValue();
+            if (msPerTick instanceof Number) {
+                double value = ((Number) msPerTick).doubleValue();
+                if (value > 0.0) {
+                    return 1000.0 / value;
+                }
             }
         } catch (ReflectiveOperationException ignored) {
             // Fallback op standaard TPS als methodes verschillen per Minecraft-versie.

@@ -1,34 +1,35 @@
 package net.mert.deencraft.util;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 public enum PrayerTime {
 
-    FAJR("Fajr", LocalTime.of(6, 0)),
-    DHUHR("Dhuhr", LocalTime.of(13, 0)),
-    ASR("Asr", LocalTime.of(17, 0)),
-    MAGHRIB("Maghrib", LocalTime.of(20, 0)),
-    ISHA("Isha", LocalTime.of(22, 0));
+    FAJR("Fajr", 0),
+    DHUHR("Dhuhr", 6000),
+    ASR("Asr", 12000),
+    MAGHRIB("Maghrib", 18000),
+    ISHA("Isha", 23000);
+
+    public static final long DAY_TICKS = 24000L;
+    private static final long SUNRISE_FORBIDDEN_START = 0L;
+    private static final long SUNRISE_FORBIDDEN_END = 1000L;
 
     public final String displayName;
-    public final LocalTime time;
+    public final long startTick;
 
-    PrayerTime(String name, LocalTime time) {
+    PrayerTime(String name, long startTick) {
         this.displayName = name;
-        this.time = time;
+        this.startTick = startTick;
     }
 
-    public static PrayerTime getCurrentPrayer() {
-        LocalTime now = LocalTime.now();
-        PrayerTime last = FAJR;
+    public static PrayerTime getCurrentPrayer(long dayTime) {
+        PrayerTime current = ISHA;
 
-        for (PrayerTime p : values()) {
-            if (now.isAfter(p.time)) {
-                last = p;
+        for (PrayerTime prayerTime : values()) {
+            if (dayTime >= prayerTime.startTick) {
+                current = prayerTime;
             }
         }
-        return last;
+
+        return current;
     }
 
     public PrayerTime getNextPrayer() {
@@ -36,11 +37,20 @@ public enum PrayerTime {
         return values()[next];
     }
 
-    public LocalDateTime getNextOccurrenceFrom(LocalDateTime now) {
-        LocalDateTime candidate = now.toLocalDate().atTime(this.time);
-        if (!candidate.isAfter(now)) {
-            candidate = candidate.plusDays(1);
+    public long getNextOccurrenceFrom(long worldTime) {
+        long dayTime = Math.floorMod(worldTime, DAY_TICKS);
+        long dayStart = worldTime - dayTime;
+        long nextOccurrence = dayStart + this.startTick;
+
+        if (nextOccurrence <= worldTime) {
+            nextOccurrence += DAY_TICKS;
         }
-        return candidate;
+
+        return nextOccurrence;
+    }
+
+    public static boolean isSunriseForbidden(long dayTime) {
+        long normalized = Math.floorMod(dayTime, DAY_TICKS);
+        return normalized >= SUNRISE_FORBIDDEN_START && normalized < SUNRISE_FORBIDDEN_END;
     }
 }
