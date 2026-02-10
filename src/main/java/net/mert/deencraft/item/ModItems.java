@@ -28,17 +28,17 @@ public class ModItems {
 
     // --- FOOD ITEMS ---
     public static final Item DATE = registerItem("date", new Item.Settings()
-            .food(ModFoodComponents.DATES));
-
-    public static final Item DATES = registerItem("dates", new Item.Settings()
             .food(ModFoodComponents.DATE)
             .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food()
                     // LET OP: In 1.21.10 verwacht ApplyEffectsConsumeEffect vaak een List.of()
                     .consumeEffect(new ApplyEffectsConsumeEffect(
-                            List.of(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0)), 1.0f
+                            List.of(new StatusEffectInstance(StatusEffects.REGENERATION, 1000, 0)), 1.0f
                     ))
                     .build()
             ));
+
+    public static final Item DATES = registerItem("dates", new Item.Settings()
+            .food(ModFoodComponents.DATES));
 
     // --- REGISTRATIE LOGICA ---
     private static Item registerItem(String name, Item.Settings settings) {

@@ -5,15 +5,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements IEntityDataSaver {
 
     @Unique
     private float thirstLevel = 20.0f;
+
+    @Unique
+    private NbtCompound persistentData;
 
     @Override
     public float getThirst() {
@@ -30,6 +30,18 @@ public abstract class PlayerEntityMixin implements IEntityDataSaver {
         setThirst(this.thirstLevel + amount);
     }
 
+    @Override
+    public NbtCompound getPersistentData() {
+        if (this.persistentData == null) {
+            this.persistentData = new NbtCompound();
+        }
+        return this.persistentData;
+    }
+
+    @Override
+    public void setPersistentData(NbtCompound nbt) {
+        this.persistentData = nbt;
+    }
     /*
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeThirstNbt(NbtCompound nbt, CallbackInfo ci) {
