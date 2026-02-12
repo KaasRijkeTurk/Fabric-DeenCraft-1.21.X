@@ -22,6 +22,7 @@ public class ModItemGroups {
                         entries.add(ModItems.ASTROLABE);
                         entries.add(ModItems.MISWAK);
                         entries.add(ModItems.DATE);
+                        entries.add(ModItems.DATE_AJWA);
                         entries.add(ModItems.DATES);
                         entries.add(ModBlocks.PRAYER_MAT_BLUE);
                         entries.add(ModBlocks.PRAYER_MAT_RED);

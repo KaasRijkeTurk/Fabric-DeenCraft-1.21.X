@@ -48,18 +48,4 @@ public abstract class PlayerEntityMixin implements IEntityDataSaver {
             this.persistentData.putInt(THIRST_KEY, 20);
         }
     }
-
-    /*
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    public void writeThirstNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putFloat("thirstLevel", this.thirstLevel);
-    }
-
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    public void readThirstNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains("thirstLevel")) {
-            this.thirstLevel = nbt.getFloat("thirstLevel");
-        }
-    }
-*/
 }

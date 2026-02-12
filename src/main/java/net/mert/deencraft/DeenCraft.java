@@ -8,6 +8,7 @@ import net.mert.deencraft.event.PrayerMatClickHandler;
 import net.mert.deencraft.event.WaterDrinkHandler;
 import net.mert.deencraft.item.ModItemGroups;
 import net.mert.deencraft.item.ModItems;
+import net.mert.deencraft.networking.BarakahSyncS2CPacket;
 import net.mert.deencraft.networking.ThirstDataSyncS2CPacket;
 import net.mert.deencraft.util.PrayerTracker;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ public class DeenCraft implements ModInitializer {
 
 		// Alleen de registratie van het TYPE pakketje hier laten staan
 		PayloadTypeRegistry.playS2C().register(ThirstDataSyncS2CPacket.ID, ThirstDataSyncS2CPacket.CODEC);
+		PayloadTypeRegistry.playS2C().register(BarakahSyncS2CPacket.ID, BarakahSyncS2CPacket.CODEC);
 
 		// De UseBlockCallback die je hieronder hebt staan is dubbelop met je WaterDrinkHandler.
 		// Je kunt deze hier weghalen als WaterDrinkHandler.register() hetzelfde doet!

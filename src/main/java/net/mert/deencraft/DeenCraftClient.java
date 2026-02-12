@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.mert.deencraft.block.ModBlocks;
 import net.mert.deencraft.client.DropHudOverlay;
+import net.mert.deencraft.networking.BarakahSyncS2CPacket;
 import net.mert.deencraft.networking.ThirstDataSyncS2CPacket;
 import net.minecraft.client.render.BlockRenderLayer;
 
@@ -17,6 +18,7 @@ public class DeenCraftClient implements ClientModInitializer {
 
         // De cruciale link voor je dorst-data
         ClientPlayNetworking.registerGlobalReceiver(ThirstDataSyncS2CPacket.ID, ThirstDataSyncS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(BarakahSyncS2CPacket.ID, BarakahSyncS2CPacket::receive);
 
         HudRenderCallback.EVENT.register(new DropHudOverlay());
     }

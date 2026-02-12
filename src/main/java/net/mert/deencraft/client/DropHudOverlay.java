@@ -25,10 +25,16 @@ public class DropHudOverlay implements HudRenderCallback {
         if (client.player.isCreative() || client.player.isSpectator()) return;
 
         int thirstLevel = 0;
+        int barakahLevel = 0;
+        int dailyProgress = 0;
+        int perfectDayStreak = 0;
 
         if (client.player instanceof IEntityDataSaver saver) {
             // Gebruik orElse(20) zodat de HUD standaard vol start
             thirstLevel = saver.getPersistentData().getInt("thirst").orElse(20);
+            barakahLevel = saver.getPersistentData().getInt("barakah_level").orElse(0);
+            dailyProgress = saver.getPersistentData().getInt("barakah_daily_progress").orElse(0);
+            perfectDayStreak = saver.getPersistentData().getInt("barakah_perfect_day_streak").orElse(0);
         }
 
         int width = client.getWindow().getScaledWidth();
@@ -48,6 +54,12 @@ public class DropHudOverlay implements HudRenderCallback {
                 drawCustomDrop(context, HALF_DROP, xPos, y);
             }
         }
+
+        int barakahX = width / 2 + 92;
+        int barakahY = height - 52;
+        context.drawTextWithShadow(client.textRenderer, "Barakah: " + barakahLevel + "/5", barakahX, barakahY, 0xFFD86B);
+        context.drawTextWithShadow(client.textRenderer, "Vandaag: " + dailyProgress + "/5", barakahX, barakahY + 10, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, "Perfecte dagen: " + perfectDayStreak, barakahX, barakahY + 20, 0xAAFFAA);
     }
 
     private void drawCustomDrop(DrawContext context, Identifier texture, int x, int y) {

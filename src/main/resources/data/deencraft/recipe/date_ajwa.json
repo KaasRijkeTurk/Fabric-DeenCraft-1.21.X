@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "food",
+  "pattern": [
+    "DHD",
+    "DID",
+    "DDD"
+  ],
+  "key": {
+    "D": "deencraft:dates",
+    "I": "minecraft:ink_sac",
+    "H": "minecraft:honey_bottle"
+  },
+  "result": {
+    "id": "deencraft:date_ajwa",
+    "count": 1
+  }
+}

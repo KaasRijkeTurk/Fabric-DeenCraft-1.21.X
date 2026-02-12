@@ -26,14 +26,35 @@ public class ModItems {
     public static final Item ASTROLABE = registerItem("astrolabe", new Item.Settings());
 
     public static final Item DATE = registerHydratingFoodItem("date", new Item.Settings()
-            .food(ModFoodComponents.DATE), 6);
-
-    public static final Item DATES = registerHydratingFoodItem("dates", new Item.Settings()
-            .food(ModFoodComponents.DATES)
+            .food(ModFoodComponents.DATE)
             .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food()
                     .consumeEffect(new ApplyEffectsConsumeEffect(
                             List.of(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0)), 1.0f
                     ))
+                    .build()
+            ), 8);
+
+    public static final Item DATE_AJWA = registerHydratingFoodItem("date_ajwa", new Item.Settings()
+            .food(ModFoodComponents.DATE_AJWA)
+            .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food()
+                    .consumeEffect(new ApplyEffectsConsumeEffect(
+                            List.of(
+                                    // 1. Regeneratie: 30 seconden (600 ticks)
+                                    new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0),
+
+                                    // 2. Bescherming tegen Gif: 5 minuten (6000 ticks)
+                                    new StatusEffectInstance(StatusEffects.RESISTANCE, 6000, 0),
+
+                                    // 3. Verzadiging: 2 minuten (2400 ticks) zodat je geen honger krijgt
+                                    new StatusEffectInstance(StatusEffects.SATURATION, 2400, 0)
+                            ), 1.0f // 1.0f betekent 100% kans dat deze effecten worden toegepast
+                    ))
+                    .build()
+            ), 12);
+
+    public static final Item DATES = registerHydratingFoodItem("dates", new Item.Settings()
+            .food(ModFoodComponents.DATES)
+            .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food()
                     .build()
             ), 1);
 
@@ -54,6 +75,7 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> {
             entries.add(DATE);
+            entries.add(DATE_AJWA);
             entries.add(DATES);
         });
 

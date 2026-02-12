@@ -9,9 +9,18 @@ public class ModFoodComponents {
             .alwaysEdible()
             .build();
 
+
     public static final FoodComponent DATE = new FoodComponent.Builder()
             .nutrition(5)
             .saturationModifier(1.0f)
             .alwaysEdible()
             .build();
+
+    public static final FoodComponent DATE_AJWA = new FoodComponent.Builder()
+            .nutrition(6)
+            .saturationModifier(1.3f)
+            .alwaysEdible()
+            .build();
+
 }
+
