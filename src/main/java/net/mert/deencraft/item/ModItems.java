@@ -5,6 +5,7 @@ import net.mert.deencraft.DeenCraft;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ConsumableComponents;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -19,11 +20,14 @@ import java.util.List;
 
 public class ModItems {
 
-    public static final Item TASBIH_WOODEN = registerItem("tasbih_wooden", new Item.Settings());
-    public static final Item TASBIH_IRON = registerItem("tasbih_iron", new Item.Settings());
-    public static final Item ISLAM_ICON = registerItem("islam_icon", new Item.Settings());
-    public static final Item MISWAK = registerItem("miswak", new Item.Settings());
-    public static final Item ASTROLABE = registerItem("astrolabe", new Item.Settings());
+    public static final Item TASBIH_WOODEN = registerSimpleItem("tasbih_wooden");
+    public static final Item TASBIH_IRON = registerSimpleItem("tasbih_iron");
+    public static final Item ISLAM_ICON = registerSimpleItem("islam_icon");
+    public static final Item MISWAK = registerSimpleItem("miswak");
+    public static final Item ASTROLABE = registerSimpleItem("astrolabe");
+    public static final Item ELYTRA_IBN = registerItem("elytra_ibn", new Item.Settings()
+            .maxDamage(216)
+            .equippable(EquipmentSlot.CHEST));
 
     public static final Item DATE = registerHydratingFoodItem("date", new Item.Settings()
             .food(ModFoodComponents.DATE)
@@ -58,6 +62,10 @@ public class ModItems {
                     .build()
             ), 1);
 
+    private static Item registerSimpleItem(String name) {
+        return registerItem(name, new Item.Settings());
+    }
+
     private static Item registerItem(String name, Item.Settings settings) {
         RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DeenCraft.MOD_ID, name));
         Item item = new Item(settings.registryKey(key));
@@ -85,6 +93,7 @@ public class ModItems {
             entries.add(MISWAK);
             entries.add(ASTROLABE);
             entries.add(ISLAM_ICON);
+            entries.add(ELYTRA_IBN);
         });
     }
 }

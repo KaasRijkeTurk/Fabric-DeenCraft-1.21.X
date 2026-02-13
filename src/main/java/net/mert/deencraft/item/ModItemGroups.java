@@ -24,6 +24,7 @@ public class ModItemGroups {
                         entries.add(ModItems.DATE);
                         entries.add(ModItems.DATE_AJWA);
                         entries.add(ModItems.DATES);
+                        entries.add(ModItems.ELYTRA_IBN);
                         entries.add(ModBlocks.PRAYER_MAT_BLUE);
                         entries.add(ModBlocks.PRAYER_MAT_RED);
                         entries.add(ModBlocks.PRAYER_MAT_GREEN);

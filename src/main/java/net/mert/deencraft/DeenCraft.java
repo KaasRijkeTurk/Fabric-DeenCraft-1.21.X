@@ -3,6 +3,7 @@ package net.mert.deencraft;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.mert.deencraft.block.ModBlocks;
+import net.mert.deencraft.event.IbnFirnasWingsHandler;
 import net.mert.deencraft.event.PlayerTickHandler;
 import net.mert.deencraft.event.PrayerMatClickHandler;
 import net.mert.deencraft.event.WaterDrinkHandler;
@@ -28,6 +29,7 @@ public class DeenCraft implements ModInitializer {
 
 		PrayerMatClickHandler.register();
 		WaterDrinkHandler.register(); // Deze is goed!
+		IbnFirnasWingsHandler.register();
 		PlayerTickHandler.register();
 		PrayerTracker.register();
 
