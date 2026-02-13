@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "wings": [
+      {
+        "texture": "deencraft:elytra_ibn",
+        "use_player_texture": true
+      }
+    ]
+  }
+}
