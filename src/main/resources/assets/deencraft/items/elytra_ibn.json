@@ -3,17 +3,43 @@
     "type": "minecraft:condition",
     "property": "minecraft:broken",
     "on_false": {
-      "type": "minecraft:special",
-      "base": "deencraft:item/elytra_ibn",
-      "model": {
-        "type": "minecraft:elytra"
+      "type": "minecraft:select",
+      "property": "minecraft:display_context",
+      "cases": [
+        {
+          "when": ["gui", "ground", "fixed"],
+          "model": {
+            "type": "minecraft:model",
+            "model": "deencraft:item/elytra_ibn"
+          }
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:special",
+        "base": "deencraft:item/elytra_ibn",
+        "model": {
+          "type": "minecraft:elytra"
+        }
       }
     },
     "on_true": {
-      "type": "minecraft:special",
-      "base": "minecraft:item/elytra_broken",
-      "model": {
-        "type": "minecraft:elytra"
+      "type": "minecraft:select",
+      "property": "minecraft:display_context",
+      "cases": [
+        {
+          "when": ["gui", "ground", "fixed"],
+          "model": {
+            "type": "minecraft:model",
+            "model": "minecraft:item/elytra_broken"
+          }
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:special",
+        "base": "minecraft:item/elytra_broken",
+        "model": {
+          "type": "minecraft:elytra"
+        }
       }
     }
   }
