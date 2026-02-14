@@ -1,9 +1,9 @@
 {
   "layers": {
-    "wings": [
+    "humanoid_wings": [
       {
-        "texture": "deencraft:elytra_ibn",
-        "use_player_texture": true
+        "texture": "deencraft:entity/equipment/humanoid_wings/elytra_ibn",
+        "use_player_texture": false
       }
     ]
   }
