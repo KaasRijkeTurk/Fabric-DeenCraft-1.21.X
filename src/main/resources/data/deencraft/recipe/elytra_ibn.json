@@ -2,14 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "F F",
-    "SWS",
-    "S S"
+    "SSS",
+    "WLW",
+    "F F"
   ],
   "key": {
     "F": "minecraft:feather",
-    "S": "minecraft:string",
-    "W": "minecraft:white_wool"
+    "S": "minecraft:stick",
+    "W": "minecraft:white_wool",
+    "L": "minecraft:leather"
   },
   "result": {
     "id": "deencraft:elytra_ibn",

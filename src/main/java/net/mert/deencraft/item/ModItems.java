@@ -26,6 +26,9 @@ public class ModItems {
     public static final Item ISLAM_ICON = registerSimpleItem("islam_icon");
     public static final Item MISWAK = registerSimpleItem("miswak");
     public static final Item ASTROLABE = registerSimpleItem("astrolabe");
+    public static final Item CATGUT = registerSimpleItem("catgut");
+    public static final Item HAYTHAM_LENS  = registerSimpleItem("haytham_lens");
+
 
     public static final Item ELYTRA_IBN = registerConfiguredItem("elytra_ibn", new Item.Settings()
             .maxDamage(216)
@@ -58,6 +61,14 @@ public class ModItems {
             .food(ModFoodComponents.DATES)
             .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food().build()), 6);
 
+    public static final Item OLIVES = registerHydratingFoodItem("olives", new Item.Settings()
+            .food(ModFoodComponents.OLIVES)
+            .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food().build()), 6);
+
+    public static final Item SOAP_ARABIC = registerHydratingFoodItem("soap_arabic", new Item.Settings()
+            .food(ModFoodComponents.SOAP_ARABIC)
+            .component(DataComponentTypes.CONSUMABLE, ConsumableComponents.food().build()), 10);
+
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, Identifier.of(DeenCraft.MOD_ID, name), item);
     }
@@ -85,6 +96,8 @@ public class ModItems {
             entries.add(DATE);
             entries.add(DATE_AJWA);
             entries.add(DATES);
+            entries.add(OLIVES);
+            entries.add(SOAP_ARABIC);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
@@ -94,6 +107,8 @@ public class ModItems {
             entries.add(ASTROLABE);
             entries.add(ISLAM_ICON);
             entries.add(ELYTRA_IBN);
+            entries.add(HAYTHAM_LENS);
+            entries.add(CATGUT);
         });
     }
 }

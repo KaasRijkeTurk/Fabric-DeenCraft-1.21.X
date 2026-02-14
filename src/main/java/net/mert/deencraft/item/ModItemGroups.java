@@ -20,11 +20,15 @@ public class ModItemGroups {
                         entries.add(ModItems.TASBIH_WOODEN);
                         entries.add(ModItems.TASBIH_IRON);
                         entries.add(ModItems.ASTROLABE);
+                        entries.add(ModItems.ELYTRA_IBN);
+                        entries.add(ModItems.HAYTHAM_LENS);
                         entries.add(ModItems.MISWAK);
+                        entries.add(ModItems.CATGUT);
                         entries.add(ModItems.DATE);
                         entries.add(ModItems.DATE_AJWA);
                         entries.add(ModItems.DATES);
-                        entries.add(ModItems.ELYTRA_IBN);
+                        entries.add(ModItems.OLIVES);
+                        entries.add(ModItems.SOAP_ARABIC);
                         entries.add(ModBlocks.PRAYER_MAT_BLUE);
                         entries.add(ModBlocks.PRAYER_MAT_RED);
                         entries.add(ModBlocks.PRAYER_MAT_GREEN);

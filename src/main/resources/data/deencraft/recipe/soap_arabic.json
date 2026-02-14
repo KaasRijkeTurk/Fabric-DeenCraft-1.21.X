@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "   ",
+    "HWO",
+    "   "
+  ],
+  "key": {
+    "H": "minecraft:honeycomb",
+    "W": "minecraft:water_bucket",
+    "O": "deencraft:olives"
+  },
+  "result": {
+    "id": "deencraft:soap_arabic",
+    "count": 1
+  }
+}

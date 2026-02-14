@@ -7,7 +7,11 @@
       "property": "minecraft:display_context",
       "cases": [
         {
-          "when": ["gui", "ground", "fixed"],
+          "when": [
+            "gui",
+            "ground",
+            "fixed"
+          ],
           "model": {
             "type": "minecraft:model",
             "model": "deencraft:item/elytra_ibn"
@@ -16,7 +20,7 @@
       ],
       "fallback": {
         "type": "minecraft:special",
-        "base": "deencraft:item/elytra_ibn",
+        "base": "deencraft:entity/equipment/elytra_ibn_3d",
         "model": {
           "type": "minecraft:elytra"
         }
@@ -27,7 +31,11 @@
       "property": "minecraft:display_context",
       "cases": [
         {
-          "when": ["gui", "ground", "fixed"],
+          "when": [
+            "gui",
+            "ground",
+            "fixed"
+          ],
           "model": {
             "type": "minecraft:model",
             "model": "minecraft:item/elytra_broken"

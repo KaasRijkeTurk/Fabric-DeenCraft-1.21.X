@@ -9,6 +9,17 @@ public class ModFoodComponents {
             .alwaysEdible()
             .build();
 
+    public static final FoodComponent OLIVES = new FoodComponent.Builder()
+            .nutrition(3)
+            .saturationModifier(2.2f)
+            .alwaysEdible()
+            .build();
+
+    public static final FoodComponent SOAP_ARABIC = new FoodComponent.Builder()
+            .nutrition(-2)
+            .saturationModifier(0f)
+            .alwaysEdible()
+            .build();
 
     public static final FoodComponent DATE = new FoodComponent.Builder()
             .nutrition(5)
